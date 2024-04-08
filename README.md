@@ -66,8 +66,7 @@ To execute the data augmentation script (`assignment2.py`), follow the steps bel
 These test functions are located in the `tests/` directory and can be executed to verify the correctness of the respective functionalities.
 
 ## Bugs & Assumptions
-- **Bugs:** 
-- Currently, there are no known bugs. However, extensive testing should be conducted to ensure the robustness and reliability of the code, especially when dealing with variations in PDF formats and unexpected data structures.
+- **Bugs:** Currently, there are no known bugs. However, extensive testing should be conducted to ensure the robustness and reliability of the code, especially when dealing with variations in PDF formats and unexpected data structures.
 
 - **Assumptions:** 
 - The PDF extraction process assumes a consistent structure across all incident reports, including the placement of date-time, location, nature, and other relevant information.
