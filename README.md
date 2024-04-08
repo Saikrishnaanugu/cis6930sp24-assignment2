@@ -66,14 +66,16 @@ To execute the data augmentation script (`assignment2.py`), follow the steps bel
 These test functions are located in the `tests/` directory and can be executed to verify the correctness of the respective functionalities.
 
 ## Bugs & Assumptions
-- **Bugs:** Please detail any known issues or bugs in the script here, including limitations of the data extraction and augmentation processes.
+- **Bugs:** 
+- Currently, there are no known bugs. However, extensive testing should be conducted to ensure the robustness and reliability of the code, especially when dealing with variations in PDF formats and unexpected data structures.
 
-- **Assumptions:** This section should outline any assumptions made during the development, such as the format of the incident PDFs, reliability of external APIs for weather data, or assumptions regarding the data's completeness and accuracy.
+- **Assumptions:** 
+- The PDF extraction process assumes a consistent structure across all incident reports, including the placement of date-time, location, nature, and other relevant information.
+- The geocoding process assumes that the locations extracted from the incident reports can be accurately converted into latitude and longitude coordinates using the Geopy library.
+- The weather data retrieval relies on an external API (OpenWeatherMap) and assumes consistent availability and accuracy of historical weather data for the specified locations and timestamps.
+- The EMSSTAT flag assumes a specific format or keyword within the incident reports to identify emergency medical service statuses.
+- Data augmentation assumes that the provided incident reports contain sufficient and representative information for generating additional features, such as day of the week, time of day, and weather conditions.
 
 ## Resources
-- Model Cards and Data Sheets: [Link to resource]
-- Historical Weather API: [Link to OpenWeatherMap API documentation]
-- Geocoding API: [Link to Geopy documentation]
-
-## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+- Model Cards and Data Sheets: [[Link to resource](https://www.normanok.gov/public-safety/police-department/crime-prevention-data/department-activity-reports)]
+- Historical Weather API: [[Link to OpenWeatherMap API documentation](https://openweathermap.org/api)]
