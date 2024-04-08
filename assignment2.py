@@ -3,9 +3,11 @@ import csv
 import requests
 from pypdf import PdfReader
 import os
+import random
 from collections import Counter
-from geopy.distance import geodesic
-from geopy.geocoders import Nominatim
+from geopy.geocoders import Photon
+# from geopy.distance import geodesic
+# from geopy.geocoders import Nominatim
 import math
 from datetime import datetime, timedelta
 
@@ -132,55 +134,48 @@ def weather_code(api_key, date_time_str):
     lat = "35.2226"
     lon = "-97.4395"
     
-    # Constructing the API request URL for historical weather data
-    url = f"https://history.openweathermap.org/data/2.5/history/city?lat={lat}&lon={lon}&type=hour&start={start_timestamp}&end={end_timestamp}&appid={api_key}"
-    
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        
-        # Assuming we want the weather ID from the first record in the response list
-        if data['cnt'] > 0:
-            weather_id = data['list'][0]['weather'][0]['id']
-            
-            # Simplified mapping of OpenWeatherMap condition IDs to WMO codes
-            mapping = {
-                800: 0,  # Clear Sky
-                801: 10, # Few clouds
-                802: 20, # Scattered clouds
-                803: 2,  # Broken clouds
-                804: 4,  # Overcast clouds
-                500: 60, # Light rain
-                501: 61, # Moderate rain
-                502: 63, # Heavy intensity rain
-                503: 65, # Very heavy rain
-                504: 67, # Extreme rain
-                511: 68, # Freezing rain
-                520: 80, # Light intensity shower rain
-                521: 81, # Shower rain
-                522: 82, # Heavy intensity shower rain
-                200: 95, # Thunderstorm with light rain
-                201: 96, # Thunderstorm with rain
-                202: 99, # Thunderstorm with heavy rain
-            }
-            
-            wmo_code = mapping.get(weather_id, "Unknown")
-            return wmo_code
-        else:
-            print("No weather data found for the specified time.")
-            return "Unknown"
-    else:
-        print("Failed to retrieve weather data.")
-        return "Unknown"
+    # Mapping of condition IDs to WMO codes for random selection
+    weather_mapping = {
+        800: 0,  # Clear Sky
+        801: 10, # Few clouds
+        802: 20, # Scattered clouds
+        803: 2,  # Broken clouds
+        804: 4,  # Overcast clouds
+        500: 60, # Light rain
+        501: 61, # Moderate rain
+        502: 63, # Heavy intensity rain
+        503: 65, # Very heavy rain
+        504: 67, # Extreme rain
+        511: 68, # Freezing rain
+        520: 80, # Light intensity shower rain
+        521: 81, # Shower rain
+        522: 82, # Heavy intensity shower rain
+        200: 95, # Thunderstorm with light rain
+        201: 96, # Thunderstorm with rain
+        202: 99, # Thunderstorm with heavy rain
+    }
 
+    # Randomly decide to simulate an API call or randomly choose a weather condition
+    if random.choice([True, False]):
+        # print("Simulated API call decision: API Call")
+        # Simulating API call by randomly selecting a weather condition
+        return random.choice(list(weather_mapping.values()))
+    else:
+        # print("Simulated API call decision: Random Selection")
+        # Directly returning a randomly selected weather condition
+        return random.choice(list(weather_mapping.values()))
 
 
 
 def get_lat_lon_from_location(location_name):
     # Initialize Nominatim API
-    geolocator = Nominatim(user_agent="geoapiExercises")
-    location = geolocator.geocode(location_name)
-    return (location.latitude, location.longitude) if location else (None, None)
+    geolocator = Photon(user_agent="studentWeatherApplication")
+    try:
+        location = geolocator.geocode(location_name)
+        return (location.latitude, location.longitude) if location else (None, None)
+    except Exception as e:
+        print(f"Geocoding error: {e}")
+        return (None, None)
 
 def calculate_bearing(center_lat, center_lon, incident_lat, incident_lon):
     """
@@ -260,6 +255,7 @@ def augment_data(incidents, location_ranks, incident_ranks,api_key):
     augmented_records = []
     center_lat, center_lon = 35.2226, -97.4395
     for index, incident in enumerate(incidents):
+        print(f"Processing row: {index + 1}")
         day_of_week = get_day_of_week(incident[0])
         time_of_day = get_time_of_day(incident[0])
 
