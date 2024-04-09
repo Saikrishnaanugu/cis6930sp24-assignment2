@@ -4,6 +4,7 @@ import requests
 from pypdf import PdfReader
 import os
 import random
+import base64
 from collections import Counter
 from geopy.geocoders import Photon
 # from geopy.distance import geodesic
@@ -311,7 +312,15 @@ def print_augmented_data(augmented_records):
 
 # Main function
 def main(urls_filename):
-    api_key = '92ac63a7d42f48bcd540a913377d07a6'
+    # api_key = '3643c3313e6249961bbf44b4291ea535'
+
+    # Read the encoded key from a file
+    with open('api_key.txt', 'r') as file:
+        encoded_key = file.read()
+
+    # Decode the API key
+    api_key = base64.b64decode(encoded_key.encode('utf-8')).decode('utf-8')
+
     urls = get_urls_from_csv(urls_filename)
     for url in urls:
         download_pdf(url)
