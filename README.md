@@ -1,80 +1,77 @@
-
 # CIS 6930, Spring 2024 Assignment 2 - Data Augmentation
 
 ## Author
-Name: [Srinivas Pavan Singh Runval]  
-UFID: [93324706]
+Name: Sai Krishna Anugu 
+UFID: 42266064
+
 
 ## Introduction
-Assignment 2 focuses on data augmentation on police incident records extracted in Assignment 0. The objective is to enrich the dataset with additional information like the day of the week, time of day, weather conditions, etc., considering fairness and bias. This augmented data supports deeper analysis and serves as a prepared dataset for subsequent processes in a data pipeline.
+Assignment 2 focuses on data augmentation on police incident records extracted in Assignment 0. The objective is to  extracting incident data from those PDFs, and augmenting that data with additional information such as the day of the week, time of day, weather conditions, location ranks, and incident nature ranks, considering fairness and bias. This augmented data supports deeper analysis and serves as a prepared dataset for subsequent processes in a data pipeline.
+
 
 ## Running Instructions
 To execute the data augmentation script (`assignment2.py`), follow the steps below. Ensure Python 3 and required libraries (`requests`, `pypdf`, `geopy`, etc.) are installed.
 
+
 1. **Setup Environment:**  
-   Ensure Python 3.6 or newer is installed along with `pipenv` for handling virtual environments and dependencies.
-   ```bash
+  
    pip install pipenv
-   ```
+   
 
 2. **Install Dependencies:**  
-   Navigate to the project directory and install dependencies using:
-   ```bash
+  
    pipenv install
-   ```
+   
 
 3. **Activate Virtual Environment:**  
-   Activate the virtual environment with:
-   ```bash
+   
    pipenv shell
-   ```
+   
    Alternatively, use `pipenv run` before commands to run them directly within the virtual environment.
 
 4. **Execute the Script:**  
-   Use the following command to run `assignment2.py`:
-   ```bash
+   
    pipenv run python assignment2.py --urls <Path to CSV file with URLs>
    ```
    Replace `<Path to CSV file with URLs>` with the actual file path. This CSV file should contain URLs to the PDFs of incident reports.
 
+
 ## Detailed Function Descriptions
 
-- **`download_pdf(url)`:** Downloads a PDF file from a given URL and saves it to the `./docs` directory.
+ **`download_pdf(url)`:** This function takes a URL as input and performs a web request to download the content located at that URL, assumed to be a PDF document. The function creates a directory (if it doesn't already exist) to store the downloaded PDF and saves the file with a predefined name in the specified path. This setup is useful for automating the retrieval and local storage of PDF documents from online sources.
 
-- **`extract_incidents(pdf_path)`:** Extracts incident records from a downloaded PDF file. Each record includes date/time, incident number, location, nature, and incident ORI.
+ **`extract_incidents(pdf_path)`:** After downloading the PDF, this function opens and reads the document, extracting text from each page. It processes the text to identify and organize data related to incidents reported within the document. The function employs text analysis to determine the start indices of columns and ensures data is correctly segmented, addressing challenges posed by varying formats and layouts in PDF documents.
 
-- **`calculate_location_ranks(incidents)`:** Calculates and assigns ranks to incident locations based on their frequency of occurrence.
+ **`calculate_location_ranks(incidents)`:** Utilizing the data extracted from the PDF, this function focuses on the locations associated with each incident. It counts how frequently each location appears in the dataset and assigns ranks based on this frequency. Locations that appear more often are given higher priority. This ranking system can help in identifying areas with higher incidences of events, valuable for analysis and resource allocation.
 
-- **`get_day_of_week(date_time_str)`, `get_time_of_day(date_time_str)`:** Extract the day of the week and the hour of the day from the incident date/time string, respectively.
+ **`get_day_of_week(date_time_str)`, `get_time_of_day(date_time_str)`:** These functions parse the datetime strings from the incident data, converting them into more useful formats. get_day_of_week calculates which day of the week the incident occurred, and get_time_of_day extracts the hour of the day. This temporal data is crucial for analyzing trends and patterns in incident occurrences over time.
 
-- **`weather_code(api_key, date_time_str)`:** Retrieves weather conditions for the incident's date/time and location using the OpenWeatherMap API, mapping the conditions to WMO codes.
+ **`weather_code(api_key, date_time_str)`:** By interfacing with the OpenWeatherMap API, this function retrieves historical weather conditions for the time and location of each incident. It maps the weather data to a simplified code system for easy analysis, providing insights into how weather conditions may influence incident rates.
 
-- **`get_lat_lon_from_location(location_name)`, `calculate_bearing(...)`, `determine_side_of_town(bearing)`:** Determine the approximate side of town (N, S, E, W, etc.) for an incident location using geocoding and bearing calculations.
+ **`get_lat_lon_from_location(location_name)`:** This geocoding function converts location names into geographical coordinates (latitude and longitude). It uses the Nominatim service to resolve location names to coordinates, essential for geographical analyses and mapping incidents to specific locations.
 
-- **`calculate_incident_ranks(incidents)`:** Assigns ranks to incidents based on the frequency of their nature.
+ **`calculate_bearing(...)`, `determine_side_of_town(bearing)`:** These functions calculate the directional bearing from a central point to the incident location and categorize the incident's location in terms of the cardinal and intercardinal directions (e.g., N, NE, E). This is useful for spatially analyzing where incidents occur relative to a central point of interest
 
-- **`check_emsstat(incident, incidents, current_index)`:** Checks whether an incident involves an EMS status, either directly or in closely subsequent records.
+ **`calculate_incident_ranks(incidents)`:** Similar to calculate_location_ranks, but focuses on the nature or type of incidents. It ranks each incident type based on occurrence frequency, aiding in identifying the most common types of incidents.
 
-- **`augment_data(...)`:** Augments each incident record with additional derived information (day of the week, weather conditions, etc.) and prints the augmented data to stdout.
+ **`check_emsstat(incident, incidents, current_index)`:** Examines whether an incident record or subsequent records (for a similar time and location) indicate an EMS status, providing insights into the response or severity associated with incidents.
 
-- **`get_urls_from_csv(file_path)`:** Parses a CSV file to extract URLs of incident PDFs.
+ **`augment_data(...)`:**  Integrates all the previously defined functions to enrich the incident data with additional attributes like day of the week, weather conditions, location and incident ranks, and more. This augmented dataset is more comprehensive and can support deeper analysis.
+
+ **`get_urls_from_csv(file_path)`:**  Extracts URLs from a given CSV file. This utility function is designed to feed the download_pdf function with sources for PDF documents
+
 
 ## Testing
-- **`test_get_time_of_day()`:** Validates the correctness of extracting the time of day from a date/time string.
-- **`test_get_day_of_week()`:** Ensures the day of the week is accurately determined from a date/time string.
+ **`test_get_time_of_day()`:** The function test_get_time_of_day_additional() is designed to verify the accuracy of the get_time_of_day function, which extracts the hour from a given datetime string. It includes three specific test cases: early morning before sunrise, noon, and early evening, to ensure the function correctly identifies various times of the day. Each test case asserts that the function returns the expected hour, based on 24-hour format input, demonstrating the function's reliability across different times. The message printed confirms the successful passing of all additional test scenarios.
+ **`test_get_day_of_week()`:**  The test_get_day_of_week_additional() function is designed to validate the accuracy of the get_day_of_week function by using specific dates with known weekdays. It tests the function's ability to correctly identify the day of the week from a given date string, ensuring the function's reliability across various days. This includes verifying that the function accurately maps dates to their corresponding day of the week, with Sunday as 1 and Saturday as 7, through assertions that compare expected outcomes with actual function outputs.
 
-These test functions are located in the `tests/` directory and can be executed to verify the correctness of the respective functionalities.
 
 ## Bugs & Assumptions
-- **Bugs:** Currently, there are no known bugs. However, extensive testing should be conducted to ensure the robustness and reliability of the code, especially when dealing with variations in PDF formats and unexpected data structures.
+- **Bugs:** 1. The accuracy of text extraction from PDFs can vary based on the document's formatting. Complex layouts might not be accurately parsed, leading to potential data loss or misinterpretation.
+2.Historical weather data retrieval is based on timestamps which may not perfectly align with the incident times, possibly affecting the accuracy of weather conditions associated with incidents.
 
-- **Assumptions:** 
-- The PDF extraction process assumes a consistent structure across all incident reports, including the placement of date-time, location, nature, and other relevant information.
-- The geocoding process assumes that the locations extracted from the incident reports can be accurately converted into latitude and longitude coordinates using the Geopy library.
-- The weather data retrieval relies on an external API (OpenWeatherMap) and assumes consistent availability and accuracy of historical weather data for the specified locations and timestamps.
-- The EMSSTAT flag assumes a specific format or keyword within the incident reports to identify emergency medical service statuses.
-- Data augmentation assumes that the provided incident reports contain sufficient and representative information for generating additional features, such as day of the week, time of day, and weather conditions.
+- **Assumptions:** The geocoding function assumes that location names are unique and can be resolved to a single set of coordinates. In reality, duplicate names or insufficient detail can lead to incorrect geolocations.
 
-## Resources
-- Model Cards and Data Sheets: [[Link to resource](https://www.normanok.gov/public-safety/police-department/crime-prevention-data/department-activity-reports)]
-- Historical Weather API: [[Link to OpenWeatherMap API documentation](https://openweathermap.org/api)]
+
+
+
